@@ -4,7 +4,7 @@ using BepInEx.Logging;
 
 namespace PeglinMapMod
 {
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION), BepInProcess("Peglin.exe")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource logger;
