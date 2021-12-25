@@ -12,7 +12,6 @@ namespace PeglinMapMod
 		[HarmonyPatch(typeof(MapController), "CreateMapDataLists"), HarmonyPrefix]
 		public static void GenerateRandomMapPatch()
         {
-			Plugin.logger.LogInfo("MapController.CreateMapDataLists");
 			MapGen.Reset();
             GameObject.FindObjectsOfType<MapNode>().Do(v => MapGen.InstantiateMapDataNode(v));
 			MapGen.GenerateMap();
