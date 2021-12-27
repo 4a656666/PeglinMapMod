@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using HarmonyLib;
 using BepInEx.Logging;
+using Worldmap;
 
 namespace PeglinMapMod
 {
@@ -11,6 +12,8 @@ namespace PeglinMapMod
 
         private void Awake()
         {
+            RegisterPotentialRooms();
+
             Configuration.BindConfig(Config);
 
             logger = Logger;
@@ -33,6 +36,14 @@ namespace PeglinMapMod
             {
                 Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} {PluginInfo.PLUGIN_NAME} {PluginInfo.PLUGIN_VERSION} was disabled.");
             }
+        }
+
+        public void RegisterPotentialRooms()
+        {
+            Configuration.EasyBattles = MapController.instance._potentialEasyBattles.ConvertAll(v => v.name);
+            Configuration.RandomBattles = MapController.instance._potentialRandomBattles.ConvertAll(v => v.name);
+            Configuration.EliteBattles = MapController.instance._potentialEliteBattles.ConvertAll(v => v.name);
+            Configuration.Scenarios = MapController.instance._potentialRandomScenarios.ConvertAll(v => v.name);
         }
     }
 }

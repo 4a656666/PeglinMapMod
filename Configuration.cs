@@ -16,10 +16,10 @@ namespace PeglinMapMod
             { "elite", RoomType.ELITE },
             { "relic", RoomType.RELIC }
         };
-        public static List<string> EasyBattles = new(new string[] { "EntryEncounter", "Bats1", "SlimeEncounter2", "SlimeEncounter3", "PlantEncounter1", "MuchoSlimeEncounter_Easy" });
-        public static List<string> RandomBattles = new(new string[] { "Bats2", "Everything", "MuchoSlimeEncounter", "SlimeEncounter4", "PlantEncounter2", "ONLYBATS" });
-        public static List<string> EliteBattles = new(new string[] { "MinotaurBossEncounter", "PlantMiniboss", "SlimeMiniBossEncounter_HARD" });
-        public static List<string> Scenarios = new(new string[] { "BrambleTree", "SunnyClearing", "Thunderstorm", "MysteriousAltarOffer", "SlimyPath", "CrowClearing", "Inferno", "HaglinScouting" });
+        public static List<string> EasyBattles = new(); // new(new string[] { "EntryEncounter", "Bats1", "SlimeEncounter2", "SlimeEncounter3", "PlantEncounter1", "MuchoSlimeEncounter_Easy" });
+        public static List<string> RandomBattles = new(); // new(new string[] { "Bats2", "Everything", "MuchoSlimeEncounter", "SlimeEncounter4", "PlantEncounter2", "ONLYBATS" });
+        public static List<string> EliteBattles = new(); // new(new string[] { "MinotaurBossEncounter", "PlantMiniboss", "SlimeMiniBossEncounter_HARD" });
+        public static List<string> Scenarios = new(); // new(new string[] { "BrambleTree", "SunnyClearing", "Thunderstorm", "MysteriousAltarOffer", "SlimyPath", "CrowClearing", "Inferno", "HaglinScouting" });
 
 
 
