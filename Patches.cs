@@ -9,20 +9,6 @@ namespace PeglinMapMod
 {
     public static class Patches
     {
-        [HarmonyPatch(typeof(MapController), "GetRandomScenario"), HarmonyPostfix]
-        public static void TestPatch()
-        {
-            Plugin.logger.LogInfo(MapController.instance._remainingRandomScenarios.Count);
-            Plugin.logger.LogInfo(MapController.instance._potentialRandomScenarios.ConvertAll(v => $"{v.name}+{v.ignoreRemove}").Join());
-        }
-
-        [HarmonyPatch(typeof(MapController), "AttemptGetTextScenario"), HarmonyPostfix]
-        public static void TestPatch2()
-        {
-            Plugin.logger.LogInfo(MapController.instance._remainingRandomScenarios.Count);
-            Plugin.logger.LogInfo(MapController.instance._potentialRandomScenarios.ConvertAll(v => $"{v.name}+{v.ignoreRemove}").Join());
-        }
-
         [HarmonyPatch(typeof(MapController), "CreateMapDataLists"), HarmonyPostfix]
         public static void RestrictBattlesAndScenariosPatch()
         {
