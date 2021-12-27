@@ -12,4 +12,4 @@ A mod for [Peglin](https://store.steampowered.com/app/1296610/Peglin/) that allo
 ## Configuration
 The mod can be configured using the `BepInEx/config/PeglinMapMod.cfg` file.
 
-Note: the config mentions 'event' and 'random' room types. Both appear as a question mark on the map, but 'event' rooms can only be a scenario while 'random' rooms can be an event, battle, elite fight, or relic.
+Note: the config mentions 'event' and 'random' room types. Both appear as a question mark on the map, but 'event' rooms can only be a scenario while 'random' rooms can be an event, battle, or relic.

@@ -16,47 +16,45 @@ namespace PeglinMapMod
 
         public static void GenerateMap()
         {
-            MapDataNode rootNode = mapData.GetMapDataNode(MapController.instance.rootNode);
             List<int> guaranteedPath = new();
-            MapDataNode currentNode = rootNode;
-            while (currentNode.children.Count > 0)
+            if (Configuration.GuaranteedPathTypeValidated.Count > 0)
             {
-                int randChild = -1;
-                do randChild = currentNode.children[Random.Range(0, currentNode.children.Count)];
-                while (!Configuration.AllowInefficientPath && currentNode.children.Any(v => mapData.GetMapDataNode(v).children.Contains(randChild)));
+                MapDataNode rootNode = mapData.GetMapDataNode(MapController.instance.rootNode);
+                MapDataNode currentNode = rootNode;
+                while (currentNode.children.Count > 0)
+                {
+                    int randChild = -1;
+                    do randChild = currentNode.children[Random.Range(0, currentNode.children.Count)];
+                    while (!Configuration.AllowInefficientPath && currentNode.children.Any(v => mapData.GetMapDataNode(v).children.Contains(randChild)));
 
 
-                guaranteedPath.Add(randChild);
-                currentNode = mapData.GetMapDataNode(randChild);
+                    guaranteedPath.Add(randChild);
+                    currentNode = mapData.GetMapDataNode(randChild);
+                }
             }
 
             foreach (var mapNode in mapData.map.Values)
             {
                 RoomType selectedRoomType = RoomType.NONE;
-                if (guaranteedPath.Contains(mapNode.id) && Configuration.GuaranteedPathTypeValidated.Count > 0)
-                {
-                    selectedRoomType = Configuration.GuaranteedPathTypeValidated[Random.Range(0, Configuration.GuaranteedPathTypeValidated.Count)];
-                }
-                else
-                {
-                    List<RoomType> possibleRoomTypes = new(Configuration.RoomWeights.Keys);
+                List<RoomType> possibleRoomTypes = guaranteedPath.Contains(mapNode.id) ?
+                    new(Configuration.GuaranteedPathTypeValidated) :
+                    new(Configuration.RoomWeights.Keys);
 
-                    int totalWeight = possibleRoomTypes.ConvertAll(v => Configuration.RoomWeights[v]).Sum();
-                    int rand = Random.Range(0, totalWeight);
+                int totalWeight = possibleRoomTypes.ConvertAll(v => Configuration.RoomWeights[v]).Sum();
+                int rand = Random.Range(0, totalWeight);
 
-                    int currentTotalWeight = 0;
-                    foreach (var possibleRoomType in possibleRoomTypes)
+                int currentTotalWeight = 0;
+                foreach (var possibleRoomType in possibleRoomTypes)
+                {
+                    currentTotalWeight += Configuration.RoomWeights[possibleRoomType];
+                    if (rand < currentTotalWeight)
                     {
-                        currentTotalWeight += Configuration.RoomWeights[possibleRoomType];
-                        if (rand < currentTotalWeight)
-                        {
-                            selectedRoomType = possibleRoomType;
-                            break;
-                        }
+                        selectedRoomType = possibleRoomType;
+                        break;
                     }
-
-                    if (Configuration.PreventElitesNearStart && selectedRoomType == RoomType.ELITE && !mapNode.associatedMapNode._canBeMiniboss) selectedRoomType = RoomType.BATTLE;
                 }
+
+                if (Configuration.PreventElitesNearStart && selectedRoomType == RoomType.ELITE && !mapNode.associatedMapNode._canBeMiniboss) selectedRoomType = RoomType.BATTLE;
 
                 mapNode.roomType = selectedRoomType;
             }
