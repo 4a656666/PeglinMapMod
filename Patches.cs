@@ -9,14 +9,28 @@ namespace PeglinMapMod
 {
     public static class Patches
     {
+        public static List<MapDataBattle> _potentialEliteBattles = new();
+
         [HarmonyPatch(typeof(MapController), "CreateMapDataLists"), HarmonyPostfix]
         public static void RestrictBattlesAndScenariosPatch()
         {
             MapController mc = MapController.instance;
+
+            // needs to be done because mc._potentialEliteBattles is modified and there is no mc._remainingEliteBattles
+            if (_potentialEliteBattles.Count == 0) _potentialEliteBattles.AddRange(mc._potentialEliteBattles);
+
             mc._remainingEasyBattles.RemoveAll(v => !Configuration.AllowedEasyBattlesValidated.Contains(v.name));
             mc._remainingRandomBattles.RemoveAll(v => !Configuration.AllowedRandomBattlesValidated.Contains(v.name));
             mc._remainingRandomScenarios.RemoveAll(v => !Configuration.AllowedScenariosValidated.Contains(v.name));
             mc._potentialEliteBattles.RemoveAll(v => !Configuration.AllowedEliteBattlesValidated.Contains(v.name)); // i dont like this but i dont see a different option
+
+            if (Configuration.LogAvaliableRooms)
+            {
+                Plugin.logger.LogInfo("Avaliable easy battles: " + string.Join(", ", mc._potentialEasyBattles.ConvertAll(v => "'" + v.name + "'")));
+                Plugin.logger.LogInfo("Avaliable random battles: " + string.Join(", ", mc._potentialRandomBattles.ConvertAll(v => "'" + v.name + "'")));
+                Plugin.logger.LogInfo("Avaliable scenarios: " + string.Join(", ", mc._potentialRandomScenarios.ConvertAll(v => "'" + v.name + "'")));
+                Plugin.logger.LogInfo("Avaliable elite battles: " + string.Join(", ", _potentialEliteBattles.ConvertAll(v => "'" + v.name + "'")));
+            }
         }
 
         [HarmonyPatch(typeof(MapController), "CreateMapDataLists"), HarmonyPrefix]

@@ -16,16 +16,17 @@ namespace PeglinMapMod
             { "elite", RoomType.ELITE },
             { "relic", RoomType.RELIC }
         };
-        public static List<string> EasyBattles = new(); // new(new string[] { "EntryEncounter", "Bats1", "SlimeEncounter2", "SlimeEncounter3", "PlantEncounter1", "MuchoSlimeEncounter_Easy" });
-        public static List<string> RandomBattles = new(); // new(new string[] { "Bats2", "Everything", "MuchoSlimeEncounter", "SlimeEncounter4", "PlantEncounter2", "ONLYBATS" });
-        public static List<string> EliteBattles = new(); // new(new string[] { "MinotaurBossEncounter", "PlantMiniboss", "SlimeMiniBossEncounter_HARD" });
-        public static List<string> Scenarios = new(); // new(new string[] { "BrambleTree", "SunnyClearing", "Thunderstorm", "MysteriousAltarOffer", "SlimyPath", "CrowClearing", "Inferno", "HaglinScouting" });
+        public static List<string> EasyBattles = new(new string[] { "EntryEncounter", "Bats1", "SlimeEncounter2", "SlimeEncounter3", "PlantEncounter1", "MuchoSlimeEncounter_Easy" });
+        public static List<string> RandomBattles = new(new string[] { "Bats2", "Everything", "MuchoSlimeEncounter", "SlimeEncounter4", "PlantEncounter2", "ONLYBATS" });
+        public static List<string> EliteBattles = new(new string[] { "MinotaurBossEncounter", "PlantMiniboss", "SlimeMiniBossEncounter_HARD" });
+        public static List<string> Scenarios = new(new string[] { "BrambleTree", "SunnyClearing", "Thunderstorm", "MysteriousAltarOffer", "SlimyPath", "CrowClearing", "Inferno", "HaglinScouting" });
 
 
 
         // Config entries
         private static ConfigEntry<bool> enablePluginConfig;
         private static ConfigEntry<bool> enableDebugConfig;
+        private static ConfigEntry<bool> logAvaliableRoomsConfig;
 
         private static ConfigEntry<string> guaranteedPathTypeConfig;
         private static ConfigEntry<bool> allowInefficientPathConfig;
@@ -48,6 +49,7 @@ namespace PeglinMapMod
         // Config values
         public static bool EnablePlugin => enablePluginConfig.Value;
         public static bool EnableDebug => enableDebugConfig.Value;
+        public static bool LogAvaliableRooms => logAvaliableRoomsConfig.Value;
 
         public static string GuaranteedPathType => guaranteedPathTypeConfig.Value;
         public static bool AllowInefficientPath => allowInefficientPathConfig.Value;
@@ -99,7 +101,7 @@ namespace PeglinMapMod
                 if (string.IsNullOrEmpty(AllowedEasyBattles)) return new();
 
                 List<string> _ = new List<string>(AllowedEasyBattles.Split(',')).ConvertAll(v => v.Trim());
-                _.RemoveAll(v => !EasyBattles.Contains(v));
+                //_.RemoveAll(v => !EasyBattles.Contains(v));
                 return _;
             }
         }
@@ -110,7 +112,7 @@ namespace PeglinMapMod
                 if (string.IsNullOrEmpty(AllowedRandomBattles)) return new();
 
                 List<string> _ = new List<string>(AllowedRandomBattles.Split(',')).ConvertAll(v => v.Trim());
-                _.RemoveAll(v => !RandomBattles.Contains(v));
+                //_.RemoveAll(v => !RandomBattles.Contains(v));
                 return _;
             }
         }
@@ -121,7 +123,7 @@ namespace PeglinMapMod
                 if (string.IsNullOrEmpty(AllowedEliteBattles)) return new();
 
                 List<string> _ = new List<string>(AllowedEliteBattles.Split(',')).ConvertAll(v => v.Trim());
-                _.RemoveAll(v => !EliteBattles.Contains(v));
+                //_.RemoveAll(v => !EliteBattles.Contains(v));
                 return _;
             }
         }
@@ -132,7 +134,7 @@ namespace PeglinMapMod
                 if (string.IsNullOrEmpty(AllowedScenarios)) return new();
 
                 List<string> _ = new List<string>(AllowedScenarios.Split(',')).ConvertAll(v => v.Trim());
-                _.RemoveAll(v => !Scenarios.Contains(v));
+                //_.RemoveAll(v => !Scenarios.Contains(v));
                 return _;
             }
         }
@@ -149,6 +151,11 @@ namespace PeglinMapMod
             enableDebugConfig = config.Bind(
                 "General", "EnableDebug", false,
                 "Whether or not to enable some debugging tools (f12 to skip battle, among other things)\nWarning: May cause problems"
+            );
+
+            logAvaliableRoomsConfig = config.Bind(
+                "General", "LogAvaliableRooms", false,
+                "Whether or not to log the avaliable rooms when you start a new run"
             );
 
 
