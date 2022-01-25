@@ -27,7 +27,6 @@ namespace PeglinMapMod
                     do randChild = currentNode.children[Random.Range(0, currentNode.children.Count)];
                     while (!Configuration.AllowInefficientPath && currentNode.children.Any(v => mapData.GetMapDataNode(v).children.Contains(randChild)));
 
-
                     guaranteedPath.Add(randChild);
                     currentNode = mapData.GetMapDataNode(randChild);
                 }
@@ -54,7 +53,7 @@ namespace PeglinMapMod
                     }
                 }
 
-                if (Configuration.PreventElitesNearStart && selectedRoomType == RoomType.ELITE && !mapNode.associatedMapNode._canBeMiniboss) selectedRoomType = RoomType.BATTLE;
+                if (Configuration.PreventElitesNearStart && selectedRoomType == RoomType.MINI_BOSS && !mapNode.associatedMapNode._canBeMiniboss) selectedRoomType = RoomType.BATTLE;
 
                 mapNode.roomType = selectedRoomType;
             }
@@ -89,20 +88,6 @@ namespace PeglinMapMod
             children = new List<MapNode>(associatedMapNode.ChildNodes).ConvertAll(v => MapGen.GetIDFromMapNode(v));
             roomType = RoomType.NONE;
         }
-
-        public Worldmap.RoomType GetWorldmapDotRoomType()
-        {
-            return roomType switch
-            {
-                RoomType.NONE => Worldmap.RoomType.NONE,
-                RoomType.BATTLE => Worldmap.RoomType.BATTLE,
-                RoomType.ELITE => Worldmap.RoomType.MINI_BOSS,
-                RoomType.RELIC => Worldmap.RoomType.TREASURE,
-                RoomType.EVENT => Worldmap.RoomType.SCENARIO,
-                RoomType.RANDOM => Worldmap.RoomType.UNKNOWN,
-                _ => Worldmap.RoomType.NONE,
-            };
-        }
     }
 
     public class MapData
@@ -134,15 +119,5 @@ namespace PeglinMapMod
         {
             map.Add(mapNode.id, mapNode);
         }
-    }
-
-    public enum RoomType
-    {
-        NONE,
-        BATTLE,
-        ELITE,
-        RELIC,
-        EVENT,
-        RANDOM
     }
 }

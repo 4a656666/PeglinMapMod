@@ -124,7 +124,7 @@ namespace PeglinMapMod
 
         public static void SetActiveStateInsertion(MapNode instance)
         {
-            instance.RoomType = MapGen.mapData.GetMapDataNode(instance).GetWorldmapDotRoomType();
+            instance.RoomType = MapGen.mapData.GetMapDataNode(instance).roomType;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace PeglinMapMod
 
             if (Configuration.EnablePlugin)
             {
-                Logger.LogInfo($"Got the following guaranteed path room types: {Configuration.GuaranteedPathTypeValidated.ConvertAll(v => v.ToString()).Join()}");
+                Logger.LogInfo($"Got the following guaranteed path room types: {Configuration.GuaranteedPathTypeValidated.ConvertAll(v => Configuration.roomTypeToStrMap[v] ).Join()}");
 
                 Harmony.CreateAndPatchAll(typeof(Patches), PluginInfo.PLUGIN_GUID);
 

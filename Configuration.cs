@@ -2,19 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Worldmap;
 
 namespace PeglinMapMod
 {
     public class Configuration
     {
         // Constants
-        public static Dictionary<string, RoomType> strToRoomTypeMap = new Dictionary<string, RoomType>
+        public static Dictionary<string, RoomType> strToRoomTypeMap = new()
         {
-            { "event", RoomType.EVENT },
-            { "random", RoomType.RANDOM },
+            { "event", RoomType.SCENARIO },
+            { "random", RoomType.UNKNOWN },
             { "battle", RoomType.BATTLE },
-            { "elite", RoomType.ELITE },
-            { "relic", RoomType.RELIC }
+            { "elite", RoomType.MINI_BOSS },
+            { "relic", RoomType.TREASURE }
+        };
+        public static Dictionary<RoomType, string> roomTypeToStrMap = new()
+        {
+            { RoomType.SCENARIO, "EVENT" },
+            { RoomType.UNKNOWN, "RANDOM" },
+            { RoomType.BATTLE, "BATTLE" },
+            { RoomType.MINI_BOSS, "ELITE" },
+            { RoomType.TREASURE, "RELIC" },
+            { RoomType.NONE, "NONE" },
         };
         public static List<string> EasyBattles = new(new string[] { "EntryEncounter", "Bats1", "SlimeEncounter2", "SlimeEncounter3", "PlantEncounter1", "MuchoSlimeEncounter_Easy" });
         public static List<string> RandomBattles = new(new string[] { "Bats2", "Everything", "MuchoSlimeEncounter", "SlimeEncounter4", "PlantEncounter2", "ONLYBATS" });
@@ -75,11 +85,11 @@ namespace PeglinMapMod
             get
             {
                 Dictionary<RoomType, int> dict = new();
-                dict.Add(RoomType.EVENT, EventWeight);
-                dict.Add(RoomType.RANDOM, RandomWeight);
+                dict.Add(RoomType.SCENARIO, EventWeight);
+                dict.Add(RoomType.UNKNOWN, RandomWeight);
                 dict.Add(RoomType.BATTLE, BattleWeight);
-                dict.Add(RoomType.ELITE, EliteWeight);
-                dict.Add(RoomType.RELIC, RelicWeight);
+                dict.Add(RoomType.MINI_BOSS, EliteWeight);
+                dict.Add(RoomType.TREASURE, RelicWeight);
                 return dict;
             }
         }
