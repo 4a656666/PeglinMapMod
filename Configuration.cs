@@ -31,7 +31,7 @@ namespace PeglinMapMod
         private static ConfigEntry<string> guaranteedPathTypeConfig;
         private static ConfigEntry<bool> allowInefficientPathConfig;
         private static ConfigEntry<bool> preventElitesNearStartConfig;
-        //private static ConfigEntry<string> firstRoomTypeConfig;
+        private static ConfigEntry<string> firstRoomTypeConfig;
 
         private static ConfigEntry<int> eventWeightConfig;
         private static ConfigEntry<int> randomWeightConfig;
@@ -54,7 +54,7 @@ namespace PeglinMapMod
         public static string GuaranteedPathType => guaranteedPathTypeConfig.Value;
         public static bool AllowInefficientPath => allowInefficientPathConfig.Value;
         public static bool PreventElitesNearStart => preventElitesNearStartConfig.Value;
-        //public static string FirstRoomType => firstRoomTypeConfig.Value;
+        public static string FirstRoomType => firstRoomTypeConfig.Value;
 
         public static int EventWeight => eventWeightConfig.Value;
         public static int RandomWeight => randomWeightConfig.Value;
@@ -92,6 +92,15 @@ namespace PeglinMapMod
                 List<string> _ = new List<string>(GuaranteedPathType.Split(',')).ConvertAll(v => v.Trim());
                 _.RemoveAll(v => !strToRoomTypeMap.ContainsKey(v));
                 return _.ConvertAll(v => strToRoomTypeMap[v.ToLower()]);
+            }
+        }
+        public static RoomType FirstRoomTypeValidated
+        {
+            get
+            {
+                RoomType res;
+                if (strToRoomTypeMap.TryGetValue(FirstRoomType, out res)) return res;
+                else return RoomType.NONE;
             }
         }
         public static List<string> AllowedEasyBattlesValidated
@@ -175,10 +184,10 @@ namespace PeglinMapMod
                 "Prevents elites from spawning near the start of the map.\nDoes not affect the guaranteed path."
             );
 
-            //firstRoomTypeConfig = config.Bind(
-            //    "Map", "FirstRoomType", "battle",
-            //    "Type of room for the first room.\nOptions:\n  'event' (displays as ?, only scenario)\n  'random' (displays as ?, scenario, battle, or relic)\n  'battle'\n  'elite'\n  'relic'"
-            //);
+            firstRoomTypeConfig = config.Bind(
+                "Map", "FirstRoomType", "battle",
+                "Type of room for the first room.\nOptions:\n  'event' (displays as ?, only scenario)\n  'random' (displays as ?, scenario, battle, or relic)\n  'battle'\n  'elite'\n  'relic'\nor put nothing to generate randomly."
+            );
 
 
 

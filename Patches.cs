@@ -33,6 +33,12 @@ namespace PeglinMapMod
             }
         }
 
+        [HarmonyPatch(typeof(MapController), "Start"), HarmonyPrefix]
+        public static void FirstRoomTypePatch()
+        {
+            MapController.instance.rootNode.RoomType = Configuration.FirstRoomTypeValidated;
+        }
+
         [HarmonyPatch(typeof(MapController), "CreateMapDataLists"), HarmonyPrefix]
         public static void GenerateRandomMapPatch()
         {
