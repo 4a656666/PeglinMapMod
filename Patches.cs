@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Linq;
 
 namespace PeglinMapMod
 {
@@ -39,6 +40,172 @@ namespace PeglinMapMod
             MapController.instance.rootNode.RoomType = Configuration.FirstRoomTypeValidated;
         }
 
+        [HarmonyPatch(typeof(MapController), "Start"), HarmonyPrefix]
+        public static void ReshapeMapPatch()
+        {
+            ExtendMap(Configuration.ExtendMapAmount);
+            if (Configuration.TwoBossesMapEnabled) TwoBossesMap();
+            if (Configuration.FixInefficientEdges) FixInefficientEdges();
+            MapController.instance._nodes = GameObject.FindObjectsOfType<MapNode>();
+        }
+
+        public static void FixInefficientEdges()
+        {
+            GameObject.FindObjectsOfType<MapNode>().Do(v =>
+            {
+                foreach (MapNode child in v.ChildNodes)
+                {
+                    if (v.ChildNodes.Any(otherChild => otherChild.ChildNodes.Contains(child)))
+                    {
+                        MapNode mapNode = MapGen.CreateMapNode();
+                        mapNode._childNodes = new MapNode[] { child };
+                        v._childNodes[System.Array.IndexOf(v._childNodes, child)] = mapNode;
+                        mapNode.transform.position = (child.transform.position + v.transform.position) / 2f;
+                        break;
+                    }
+                }
+            });
+        }
+
+        public static void TwoBossesMap()
+        {
+            // Original
+            // 08    25    28    13
+            //   \  /  \  /  \  /
+            //    05    33    34
+            //      \  /  \  /
+            //       26    32
+            //         \  /
+            //         BOSS
+
+            // New
+            // 08    25    28    13
+            // | \  /        \  / |
+            // |  05          34  |
+            // | /              \ |
+            // 26                32
+            // |                  |
+            // BOSS            BOSS
+
+            GameObject.Destroy(GameObject.Find("Node 33"));
+
+            MapNode node5 = GameObject.Find("Node 5").GetComponent<MapNode>();
+            MapNode node34 = GameObject.Find("Node 34").GetComponent<MapNode>();
+
+            GameObject.Find("Node 25").GetComponent<MapNode>()._childNodes = new MapNode[] { node5 };
+            GameObject.Find("Node 28").GetComponent<MapNode>()._childNodes = new MapNode[] { node34 };
+
+            MapNode node26 = GameObject.Find("Node 26").GetComponent<MapNode>();
+            MapNode node32 = GameObject.Find("Node 32").GetComponent<MapNode>();
+
+            node26.transform.position += new Vector3(-4, 0, 0);
+            node32.transform.position += new Vector3(4, 0, 0);
+
+            GameObject.Find("Node 8").GetComponent<MapNode>()._childNodes = new MapNode[] { node26, node5 };
+            GameObject.Find("Node 13").GetComponent<MapNode>()._childNodes = new MapNode[] { node34, node32 };
+
+            MapNode boss1 = GameObject.Find("BossNode").GetComponent<MapNode>();
+            MapNode boss2 = MapGen.CreateMapNode(boss1);
+
+            boss1.transform.position += new Vector3(-7, 0, 0);
+            boss2.transform.position += new Vector3(7, 0, 0);
+
+            // dont need this line cause its already that way
+            // node26._childNodes = new MapNode[] { boss1 };
+            node32._childNodes = new MapNode[] { boss2 };
+
+            int rand = Random.Range(0, 2);
+
+            boss1._potentialMapData = new global::MapData[] { boss1._potentialMapData[rand] };
+            boss2._potentialMapData = new global::MapData[] { boss2._potentialMapData[1 - rand] };
+            boss2.RoomType = RoomType.BOSS; // this is for some reason necessary
+
+            boss1.gameObject.name = "BossNode1";
+            boss2.gameObject.name = "BossNode2";
+        }
+
+        public static void ExtendMap(int n)
+        {
+            // Original
+            // 17    35    19    09
+            // | \  /  \  /  \  / |
+            // |  30    37    16  |
+            // | /  \  /  \  /  \ |
+            // 08    25    28    13
+
+            // New
+            // 17    35    19    09
+            // | \  /  \  /  \  / |
+            // |  n1    n2    n3  | --+
+            // | /  \  /  \  /  \ |   | repeated n times
+            // n4    n5    n6    n7   |
+            // | \  /  \  /  \  / | --+
+            // |  30    37    16  |
+            // | /  \  /  \  /  \ |
+            // 08    25    28    13
+
+            MapNode[] previous = new MapNode[] {
+                GameObject.Find("Node 17").GetComponent<MapNode>(),
+                GameObject.Find("Node 35").GetComponent<MapNode>(),
+                GameObject.Find("Node 19").GetComponent<MapNode>(),
+                GameObject.Find("Node 9").GetComponent<MapNode>()
+            };
+
+            MapNode[] toClone = new MapNode[]
+            {
+                previous[0].RightChild, // n1
+                previous[1].RightChild, // n2
+                previous[2].RightChild, // n3
+
+                previous[0]._childNodes[0], // n4
+                previous[0].RightChild.RightChild, // n5
+                previous[1].RightChild.RightChild, // n6
+                previous[2].RightChild.RightChild // n7
+            };
+
+            MapNode[] toMoveDown = new MapNode[]
+            {
+                toClone[0],
+                toClone[1],
+                toClone[2],
+                toClone[3],
+                toClone[4],
+                toClone[5],
+                toClone[6],
+                GameObject.Find("Node 5").GetComponent<MapNode>(),
+                GameObject.Find("Node 33").GetComponent<MapNode>(),
+                GameObject.Find("Node 34").GetComponent<MapNode>(),
+                GameObject.Find("Node 26").GetComponent<MapNode>(),
+                GameObject.Find("Node 32").GetComponent<MapNode>(),
+                GameObject.Find("BossNode").GetComponent<MapNode>()
+            };
+
+            for (int _ = 0; _ < n; _++)
+            {
+                MapNode[] cloned = toClone.ToList().ConvertAll(v => MapGen.CreateMapNode(v)).ToArray();
+
+                previous[0]._childNodes = new MapNode[] { cloned[3], cloned[0] };
+                previous[1]._childNodes = new MapNode[] { cloned[0], cloned[1] };
+                previous[2]._childNodes = new MapNode[] { cloned[1], cloned[2] };
+                previous[3]._childNodes = new MapNode[] { cloned[2], cloned[6] };
+
+                cloned[0]._childNodes = new MapNode[] { cloned[3], cloned[4] };
+                cloned[1]._childNodes = new MapNode[] { cloned[4], cloned[5] };
+                cloned[2]._childNodes = new MapNode[] { cloned[5], cloned[6] };
+
+                cloned[3]._childNodes = new MapNode[] { toClone[3], toClone[0] };
+                cloned[4]._childNodes = new MapNode[] { toClone[0], toClone[1] };
+                cloned[5]._childNodes = new MapNode[] { toClone[1], toClone[2] };
+                cloned[6]._childNodes = new MapNode[] { toClone[2], toClone[6] };
+
+                float heightDiff = previous[0].transform.position.y - toClone[3].transform.position.y;
+
+                toMoveDown.Do(v => { v.transform.position += Vector3.down * heightDiff; });
+
+                previous = new MapNode[] { cloned[3], cloned[4], cloned[5], cloned[6] };
+            }
+        }
+
         [HarmonyPatch(typeof(MapController), "CreateMapDataLists"), HarmonyPrefix]
         public static void GenerateRandomMapPatch()
         {
@@ -56,8 +223,6 @@ namespace PeglinMapMod
             Label jumpOverRandomizationLabel = new();
 
             int state = 0;
-
-            Plugin.logger.LogDebug("Transpiling MapNode.SetActiveState()...");
 
             // We are looking for the following:
             // ldarg.0

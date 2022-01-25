@@ -49,6 +49,10 @@ namespace PeglinMapMod
         private static ConfigEntry<int> eliteWeightConfig;
         private static ConfigEntry<int> relicWeightConfig;
 
+        private static ConfigEntry<bool> fixInefficientEdgesConfig;
+        private static ConfigEntry<bool> twoBossesMapEnabledConfig;
+        private static ConfigEntry<int> extendMapAmountConfig;
+
         private static ConfigEntry<string> allowedEasyBattlesConfig;
         private static ConfigEntry<string> allowedRandomBattlesConfig;
         private static ConfigEntry<string> allowedEliteBattlesConfig;
@@ -71,6 +75,10 @@ namespace PeglinMapMod
         public static int BattleWeight => battleWeightConfig.Value;
         public static int EliteWeight => eliteWeightConfig.Value;
         public static int RelicWeight => relicWeightConfig.Value;
+
+        public static bool FixInefficientEdges => fixInefficientEdgesConfig.Value;
+        public static bool TwoBossesMapEnabled => twoBossesMapEnabledConfig.Value;
+        public static int ExtendMapAmount => extendMapAmountConfig.Value;
 
         public static string AllowedEasyBattles => allowedEasyBattlesConfig.Value;
         public static string AllowedRandomBattles => allowedRandomBattlesConfig.Value;
@@ -197,6 +205,23 @@ namespace PeglinMapMod
             firstRoomTypeConfig = config.Bind(
                 "Map", "FirstRoomType", "battle",
                 "Type of room for the first room.\nOptions:\n  'event' (displays as ?, only scenario)\n  'random' (displays as ?, scenario, battle, or relic)\n  'battle'\n  'elite'\n  'relic'\nor put nothing to generate randomly."
+            );
+
+
+
+            fixInefficientEdgesConfig = config.Bind(
+                "Map Shape", "FixInefficientEdges", false,
+                "Warning: do not change the settings in this section and then load a saved game.\nAdds an extra room at the edges where you could otherwise skip a room and get a shorter path."
+            );
+
+            twoBossesMapEnabledConfig = config.Bind(
+                "Map Shape", "TwoBossesMap", false,
+                "Modifes the map to have two bosses, which will always be different."
+            );
+
+            extendMapAmountConfig = config.Bind(
+                "Map Shape", "ExtendMapAmount", 0,
+                "How much to extend the map by. Incrementing this by one adds seven new rooms, in two layers."
             );
 
 

@@ -8,6 +8,7 @@ namespace PeglinMapMod
     public class MapGen
     {
         public static MapData mapData = new();
+        public static int mapNodeIndex = 38;
 
         public static void Reset()
         {
@@ -71,6 +72,30 @@ namespace PeglinMapMod
                 mapNodeWithIDComp = mapNode.gameObject.AddComponent<MapNodeWithID>();
             return mapNodeWithIDComp.id;
         }
+
+        public static MapNode CreateMapNode(MapNode orig)
+        {
+            // the commented out lines *appear* to be unecessary as unity *seems* to do it for you
+            // nevertheless the line renderers on our custom nodes appear to be broken
+            MapNode mapNode = GameObject.Instantiate(orig.gameObject, orig.transform.parent).GetComponent<MapNode>();
+            //mapNode._icons =
+            //    orig._icons.ToList()
+            //    .ConvertAll(v => mapNode.transform.Find(v.name).gameObject)
+            //    .ToArray();
+            mapNode.gameObject.name = "Node " + mapNodeIndex++;
+            mapNode._childNodes = new MapNode[0];
+            //mapNode._leftRenderer = mapNode.transform.Find("leftLine").GetComponent<LineRenderer>();
+            //mapNode._middleRenderer = mapNode.transform.Find("midLine").GetComponent<LineRenderer>();
+            //mapNode._rightRenderer = mapNode.transform.Find("rightLine").GetComponent<LineRenderer>();
+            mapNode.RoomType = RoomType.NONE;
+            mapNode.transform.position = orig.transform.position;
+            return mapNode;
+        }
+
+        public static MapNode CreateMapNode()
+        {
+            return CreateMapNode(MapController.instance.rootNode.gameObject.GetComponent<MapNode>());
+        }
     }
 
     public class MapDataNode
@@ -85,7 +110,9 @@ namespace PeglinMapMod
         {
             associatedMapNode = _associatedMapNode;
             id = MapGen.GetIDFromMapNode(associatedMapNode);
-            children = new List<MapNode>(associatedMapNode.ChildNodes).ConvertAll(v => MapGen.GetIDFromMapNode(v));
+            children = associatedMapNode.ChildNodes == null ?
+                new List<int>() :
+                new List<MapNode>(associatedMapNode.ChildNodes).ConvertAll(v => MapGen.GetIDFromMapNode(v));
             roomType = RoomType.NONE;
         }
     }
